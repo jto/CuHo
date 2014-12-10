@@ -1,12 +1,11 @@
 package cuho
 
-
 object grammar {
   sealed trait Formulae
   object ⊤ extends Formulae
   object ⊥ extends Formulae
 
-  case class Atom(name: String) extends Formulae {
+  case class Axiom(name: String) extends Formulae {
     override def toString = name
   }
   case class ∧[L <: Formulae, R <: Formulae](l: L, r: R) extends Formulae {
@@ -38,9 +37,12 @@ object syntax {
   implicit def toImpl[L <: Formulae](l: L) = new {
     def →[R <: Formulae](r: R) = grammar.→(l, r)
   }
-  implicit def toT[L <: Formulae, R <: Formulae](l: Seq[L]) = new {
-    def ⊢[R <: Formulae](r: R) = grammar.⊢(l, r)
+  implicit def toT1[L <: Formulae](ls: Seq[L]) = new {
+    def ⊢[R <: Formulae](r: R) = grammar.⊢(ls, r)
+  }
+  implicit def toT2[L <: Formulae](l: L) = new {
+    def ⊢[R <: Formulae](r: R) = grammar.⊢(Seq(l), r)
   }
   def ⊢[R <: Formulae](r: R) = grammar.⊢(Seq.empty, r)
-  def Atom(name: String) = grammar.Atom(name)
+  def Axiom(name: String) = grammar.Axiom(name)
 }
